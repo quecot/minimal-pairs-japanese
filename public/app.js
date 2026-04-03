@@ -1,9 +1,63 @@
 const SETTINGS_KEY = "minimal-pairs-intonation.settings";
 
 const COMBINING_KANA = new Set([
-  "ァ", "ィ", "ゥ", "ェ", "ォ", "ヵ", "ヶ", "ャ", "ュ", "ョ", "ヮ",
-  "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "ゎ", "ゕ", "ゖ"
+  "ァ",
+  "ィ",
+  "ゥ",
+  "ェ",
+  "ォ",
+  "ヵ",
+  "ヶ",
+  "ャ",
+  "ュ",
+  "ョ",
+  "ヮ",
+  "ぁ",
+  "ぃ",
+  "ぅ",
+  "ぇ",
+  "ぉ",
+  "ゃ",
+  "ゅ",
+  "ょ",
+  "ゎ",
+  "ゕ",
+  "ゖ",
 ]);
+
+const MORA_BASE_CHAR = /[\p{Script=Hiragana}\p{Script=Katakana}ーｰ]/u;
+const COMBINING_MARK_CHAR = /\p{Mark}/u;
+const DAKUTEN_VARIANTS = new Map([
+  ["\u309B", "\u3099"],
+  ["\u309C", "\u309A"],
+  ["\uFF9E", "\u3099"],
+  ["\uFF9F", "\u309A"],
+]);
+const NON_MORA_SEPARATORS = new Set([
+  " ",
+  "　",
+  "・",
+  "。",
+  "、",
+  "｡",
+  "､",
+  ".",
+  ",",
+  "．",
+  "，",
+  "?",
+  "？",
+  "!",
+  "！",
+]);
+
+function normalizePronunciationText(text) {
+  let value = text;
+  for (const [from, to] of DAKUTEN_VARIANTS) {
+    value = value.replaceAll(from, to);
+  }
+  return value.normalize("NFKC").normalize("NFC");
+}
 
 const state = {
   started: false,
@@ -15,7 +69,7 @@ const state = {
   submitted: false,
   lastResultCorrect: null,
   preloadedMinimalPair: null,
-  settings: loadSettings()
+  settings: loadSettings(),
 };
 
 const dom = {
@@ -40,12 +94,14 @@ const dom = {
     heibanEnabled: document.getElementById("heibanEnabled"),
     atamadakaEnabled: document.getElementById("atamadakaEnabled"),
     secondMoraAccentEnabled: document.getElementById("secondMoraAccentEnabled"),
-    secondToLastMoraAccentEnabled: document.getElementById("secondToLastMoraAccentEnabled"),
+    secondToLastMoraAccentEnabled: document.getElementById(
+      "secondToLastMoraAccentEnabled",
+    ),
     otherNakadakaEnabled: document.getElementById("otherNakadakaEnabled"),
     onlyDevoicedWords: document.getElementById("onlyDevoicedWords"),
     lowPassEnabled: document.getElementById("lowPassEnabled"),
-    backgroundNoise: document.getElementById("backgroundNoise")
-  }
+    backgroundNoise: document.getElementById("backgroundNoise"),
+  },
 };
 
 function defaultSettings() {
@@ -57,7 +113,7 @@ function defaultSettings() {
     otherNakadakaEnabled: true,
     onlyDevoicedWords: false,
     lowPassEnabled: false,
-    backgroundNoise: false
+    backgroundNoise: false,
   };
 }
 
@@ -70,7 +126,7 @@ function emptyStatistics() {
     atamadaka: [],
     atamadakaCorrect: [],
     nakadaka: [],
-    nakadakaCorrect: []
+    nakadakaCorrect: [],
   };
 }
 
@@ -123,19 +179,32 @@ function toMoras(text) {
     return moras;
   }
 
-  for (const char of Array.from(text)) {
+  const normalized = normalizePronunciationText(text);
+
+  for (const char of Array.from(normalized)) {
     if (char === "｀") {
       continue;
     }
-    if ((char === "・" || char === " ") && moras.length > 0) {
+
+    if (NON_MORA_SEPARATORS.has(char)) {
       continue;
     }
-    if (COMBINING_KANA.has(char) && moras.length > 0) {
+
+    if (
+      (COMBINING_KANA.has(char) || COMBINING_MARK_CHAR.test(char)) &&
+      moras.length > 0
+    ) {
       moras[moras.length - 1] += char;
-    } else {
-      moras.push(char);
+      continue;
     }
+
+    if (!MORA_BASE_CHAR.test(char)) {
+      continue;
+    }
+
+    moras.push(char);
   }
+
   return moras;
 }
 
@@ -148,7 +217,9 @@ function outputAccentPlainText(rawPronunciation, accentedMora) {
 
 function outputAccentPlainTexts(phrases) {
   return phrases
-    .map((phrase) => outputAccentPlainText(phrase.rawPronunciation, phrase.accentedMora))
+    .map((phrase) =>
+      outputAccentPlainText(phrase.rawPronunciation, phrase.accentedMora),
+    )
     .join("・");
 }
 
@@ -220,7 +291,7 @@ function buildQuestion(minimalPair, pairIndex) {
     groupOffsets,
     expected,
     accentText: outputAccentPlainTexts(phrases),
-    type: classifyType(correctPair, phrases)
+    type: classifyType(correctPair, phrases),
   };
 }
 
@@ -229,9 +300,11 @@ function queryStringForMinimalPairs() {
     heibanEnabled: String(state.settings.heibanEnabled),
     atamadakaEnabled: String(state.settings.atamadakaEnabled),
     secondMoraAccentEnabled: String(state.settings.secondMoraAccentEnabled),
-    secondToLastMoraAccentEnabled: String(state.settings.secondToLastMoraAccentEnabled),
+    secondToLastMoraAccentEnabled: String(
+      state.settings.secondToLastMoraAccentEnabled,
+    ),
     otherNakadakaEnabled: String(state.settings.otherNakadakaEnabled),
-    onlyDevoicedWords: String(state.settings.onlyDevoicedWords)
+    onlyDevoicedWords: String(state.settings.onlyDevoicedWords),
   });
   return params.toString();
 }
@@ -239,13 +312,15 @@ function queryStringForMinimalPairs() {
 function audioURLForPairID(id) {
   const params = new URLSearchParams({
     lowPass: String(state.settings.lowPassEnabled),
-    backgroundNoise: String(state.settings.backgroundNoise)
+    backgroundNoise: String(state.settings.backgroundNoise),
   });
   return `/api/pronunciation/audio/${encodeURIComponent(id)}?${params.toString()}`;
 }
 
 async function fetchMinimalPair() {
-  const response = await fetch(`/api/tests/pitchAccent/minimalPairs/random?${queryStringForMinimalPairs()}`);
+  const response = await fetch(
+    `/api/tests/pitchAccent/minimalPairs/random?${queryStringForMinimalPairs()}`,
+  );
   if (!response.ok) {
     throw new Error(`Could not load item: ${response.status}`);
   }
@@ -277,8 +352,7 @@ function playPromptAudio() {
   const id = state.currentQuestion.correctPair.id;
   dom.promptAudio.src = audioURLForPairID(id);
   dom.promptAudio.load();
-  dom.promptAudio.play().catch(() => {
-  });
+  dom.promptAudio.play().catch(() => {});
 }
 
 function shouldShowContinue(correct) {
@@ -303,7 +377,7 @@ function computeStatistics() {
     atamadaka,
     atamadakaCorrect: atamadaka.filter((item) => item.correct),
     nakadaka,
-    nakadakaCorrect: nakadaka.filter((item) => item.correct)
+    nakadakaCorrect: nakadaka.filter((item) => item.correct),
   };
 }
 
@@ -344,7 +418,10 @@ async function loadRound() {
   } catch (error) {
     state.loading = false;
     render();
-    showStatus(error instanceof Error ? error.message : "Failed to load test item", "error");
+    showStatus(
+      error instanceof Error ? error.message : "Failed to load test item",
+      "error",
+    );
   }
 }
 
@@ -365,7 +442,9 @@ function submitCurrentAnswer() {
   hideStatus();
 
   const expected = state.currentQuestion.expected;
-  const correct = state.userPattern.every((value, index) => value === expected[index]);
+  const correct = state.userPattern.every(
+    (value, index) => value === expected[index],
+  );
   state.submitted = true;
   state.lastResultCorrect = correct;
 
@@ -375,7 +454,7 @@ function submitCurrentAnswer() {
     accentText: state.currentQuestion.accentText,
     type: state.currentQuestion.type,
     expected: [...expected],
-    answer: [...state.userPattern]
+    answer: [...state.userPattern],
   });
 
   computeStatistics();
@@ -384,7 +463,7 @@ function submitCurrentAnswer() {
   if (!correct) {
     showStatus(
       "Incorrect. Use the reference options below to compare patterns and audio, then click Continue.",
-      "info"
+      "info",
     );
   }
 
@@ -396,7 +475,9 @@ function submitCurrentAnswer() {
 }
 
 function syncTileButtons(index) {
-  const tile = dom.moraAnswerArea.querySelector(`.mora-tile[data-global-index="${index}"]`);
+  const tile = dom.moraAnswerArea.querySelector(
+    `.mora-tile[data-global-index="${index}"]`,
+  );
   if (!tile) {
     return;
   }
@@ -442,7 +523,8 @@ function createGroupGraph(group, groupIndex) {
   const yHigh = topPadding;
   const yLow = height - bottomPadding;
   const yMid = (yHigh + yLow) / 2;
-  const step = count > 1 ? (width - leftPadding - rightPadding) / (count - 1) : 0;
+  const step =
+    count > 1 ? (width - leftPadding - rightPadding) / (count - 1) : 0;
 
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNS, "svg");
@@ -450,7 +532,10 @@ function createGroupGraph(group, groupIndex) {
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
   svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", `Intonation graph for phrase ${groupIndex + 1}`);
+  svg.setAttribute(
+    "aria-label",
+    `Intonation graph for phrase ${groupIndex + 1}`,
+  );
 
   const makeLine = (x1, y1, x2, y2, className) => {
     const line = document.createElementNS(svgNS, "line");
@@ -462,8 +547,18 @@ function createGroupGraph(group, groupIndex) {
     return line;
   };
 
-  svg.appendChild(makeLine(leftPadding, yHigh, width - rightPadding, yHigh, "graph-guide high"));
-  svg.appendChild(makeLine(leftPadding, yLow, width - rightPadding, yLow, "graph-guide low"));
+  svg.appendChild(
+    makeLine(
+      leftPadding,
+      yHigh,
+      width - rightPadding,
+      yHigh,
+      "graph-guide high",
+    ),
+  );
+  svg.appendChild(
+    makeLine(leftPadding, yLow, width - rightPadding, yLow, "graph-guide low"),
+  );
 
   const highLabel = document.createElementNS(svgNS, "text");
   highLabel.setAttribute("x", "6");
@@ -531,17 +626,24 @@ function createGroupGraph(group, groupIndex) {
       const expectedTone = group.expected[moraIndex];
       const x = leftPadding + step * moraIndex;
 
-      const correctY = submitted ? valueToY(expectedTone) : effectiveYForIndex(moraIndex);
+      const correctY = submitted
+        ? valueToY(expectedTone)
+        : effectiveYForIndex(moraIndex);
       const correctTone = submitted
         ? expectedTone
-        : (previewYByIndex.has(moraIndex) ? getToneFromY(correctY) : userTone);
+        : previewYByIndex.has(moraIndex)
+          ? getToneFromY(correctY)
+          : userTone;
 
       correctPoints.push(`${x},${correctY}`);
       correctCircle.setAttribute("cx", String(x));
       correctCircle.setAttribute("cy", String(correctY));
       correctCircle.classList.toggle("is-high", correctTone === "H");
       correctCircle.classList.toggle("is-low", correctTone === "L");
-      correctCircle.classList.toggle("is-unset", correctTone !== "H" && correctTone !== "L");
+      correctCircle.classList.toggle(
+        "is-unset",
+        correctTone !== "H" && correctTone !== "L",
+      );
       correctCircle.classList.toggle("is-submitted", submitted);
 
       const ghostCircle = ghostCircles[moraIndex];
@@ -551,7 +653,10 @@ function createGroupGraph(group, groupIndex) {
       ghostCircle.setAttribute("cy", String(ghostY));
       ghostCircle.classList.toggle("is-high", userTone === "H");
       ghostCircle.classList.toggle("is-low", userTone === "L");
-      ghostCircle.classList.toggle("is-unset", userTone !== "H" && userTone !== "L");
+      ghostCircle.classList.toggle(
+        "is-unset",
+        userTone !== "H" && userTone !== "L",
+      );
       ghostCircle.classList.toggle("is-hidden", !submitted);
     });
 
@@ -569,7 +674,7 @@ function createGroupGraph(group, groupIndex) {
 
     return {
       x: (event.clientX - rect.left) * scaleX,
-      y: (event.clientY - rect.top) * scaleY
+      y: (event.clientY - rect.top) * scaleY,
     };
   };
 
@@ -591,7 +696,7 @@ function createGroupGraph(group, groupIndex) {
     const local = getLocalPosition(event);
     activeDrag = {
       pointerId: event.pointerId,
-      moraIndex
+      moraIndex,
     };
 
     previewYByIndex.set(moraIndex, clampY(local.y));
@@ -599,8 +704,7 @@ function createGroupGraph(group, groupIndex) {
 
     try {
       svg.setPointerCapture(event.pointerId);
-    } catch (_error) {
-    }
+    } catch (_error) {}
   };
 
   const continueInteraction = (event) => {
@@ -625,8 +729,7 @@ function createGroupGraph(group, groupIndex) {
 
     try {
       svg.releasePointerCapture(event.pointerId);
-    } catch (_error) {
-    }
+    } catch (_error) {}
 
     updateGraphVisuals();
   };
@@ -656,19 +759,26 @@ function createGroupGraph(group, groupIndex) {
     hitArea.setAttribute("width", String(hitWidth));
     hitArea.setAttribute("height", String(yLow - yHigh + 28));
     hitArea.setAttribute("class", "graph-hit-area");
-    hitArea.addEventListener("pointerdown", (event) => startInteraction(moraIndex, event));
+    hitArea.addEventListener("pointerdown", (event) =>
+      startInteraction(moraIndex, event),
+    );
     svg.appendChild(hitArea);
 
     const ghostCircle = document.createElementNS(svgNS, "circle");
     ghostCircle.setAttribute("r", "9");
-    ghostCircle.setAttribute("class", "graph-dot graph-dot-ghost is-unset is-hidden");
+    ghostCircle.setAttribute(
+      "class",
+      "graph-dot graph-dot-ghost is-unset is-hidden",
+    );
     ghostCircles.push(ghostCircle);
     svg.appendChild(ghostCircle);
 
     const circle = document.createElementNS(svgNS, "circle");
     circle.setAttribute("r", "9");
     circle.setAttribute("class", "graph-dot graph-dot-correct is-unset");
-    circle.addEventListener("pointerdown", (event) => startInteraction(moraIndex, event));
+    circle.addEventListener("pointerdown", (event) =>
+      startInteraction(moraIndex, event),
+    );
     correctCircles.push(circle);
     svg.appendChild(circle);
   });
@@ -729,7 +839,9 @@ function renderMoraArea() {
         highButton.classList.add("selected-high");
       }
       highButton.textContent = "H";
-      highButton.addEventListener("click", () => updateMoraAnswer(globalIndex, "H"));
+      highButton.addEventListener("click", () =>
+        updateMoraAnswer(globalIndex, "H"),
+      );
 
       const lowButton = document.createElement("button");
       lowButton.className = "intonation-btn";
@@ -738,7 +850,9 @@ function renderMoraArea() {
         lowButton.classList.add("selected-low");
       }
       lowButton.textContent = "L";
-      lowButton.addEventListener("click", () => updateMoraAnswer(globalIndex, "L"));
+      lowButton.addEventListener("click", () =>
+        updateMoraAnswer(globalIndex, "L"),
+      );
 
       row.appendChild(highButton);
       row.appendChild(lowButton);
@@ -788,8 +902,7 @@ function renderResultPanel() {
 function playReferencePair(id) {
   dom.promptAudio.src = audioURLForPairID(id);
   dom.promptAudio.load();
-  dom.promptAudio.play().catch(() => {
-  });
+  dom.promptAudio.play().catch(() => {});
 }
 
 function renderReferenceOptions() {
@@ -839,7 +952,8 @@ function createHistoryMiniGraph(pattern) {
   const yHigh = 14;
   const yLow = 40;
   const yMid = (yHigh + yLow) / 2;
-  const step = count > 1 ? (width - leftPadding - rightPadding) / (count - 1) : 0;
+  const step =
+    count > 1 ? (width - leftPadding - rightPadding) / (count - 1) : 0;
   const svgNS = "http://www.w3.org/2000/svg";
 
   const yForTone = (tone) => {
@@ -884,7 +998,7 @@ function createHistoryMiniGraph(pattern) {
     dot.setAttribute("r", "3.9");
     dot.setAttribute(
       "class",
-      `history-mini-dot ${tone === "H" ? "tone-high" : tone === "L" ? "tone-low" : "tone-unknown"}`
+      `history-mini-dot ${tone === "H" ? "tone-high" : tone === "L" ? "tone-low" : "tone-unknown"}`,
     );
     svg.appendChild(dot);
   });
@@ -906,7 +1020,9 @@ function buildHistoryPatternRow(label, pattern, expectedPattern = null) {
     chip.className = `history-tone-chip ${tone === "H" ? "tone-high" : "tone-low"}`;
 
     if (expectedPattern) {
-      chip.classList.add(tone === expectedPattern[index] ? "is-match" : "is-miss");
+      chip.classList.add(
+        tone === expectedPattern[index] ? "is-match" : "is-miss",
+      );
     }
 
     chip.textContent = tone;
@@ -948,7 +1064,9 @@ function renderHistory() {
     const patterns = document.createElement("div");
     patterns.className = "history-patterns";
     patterns.appendChild(buildHistoryPatternRow("Correct", item.expected));
-    patterns.appendChild(buildHistoryPatternRow("You", item.answer, item.expected));
+    patterns.appendChild(
+      buildHistoryPatternRow("You", item.answer, item.expected),
+    );
 
     li.appendChild(head);
     li.appendChild(line2);
@@ -1016,7 +1134,7 @@ function attachSettingHandlers() {
         "atamadakaEnabled",
         "secondMoraAccentEnabled",
         "secondToLastMoraAccentEnabled",
-        "otherNakadakaEnabled"
+        "otherNakadakaEnabled",
       ].includes(key);
 
       if (changedPatternToggle && !isValidPatternSelection(state.settings)) {
@@ -1024,14 +1142,17 @@ function attachSettingHandlers() {
         input.checked = previous;
         showStatus(
           "At least two compatible pattern families must stay enabled (or only other internal Nakadaka).",
-          "warn"
+          "warn",
         );
         return;
       }
 
       saveSettings();
 
-      if (["lowPassEnabled", "backgroundNoise"].includes(key) && state.currentQuestion) {
+      if (
+        ["lowPassEnabled", "backgroundNoise"].includes(key) &&
+        state.currentQuestion
+      ) {
         playPromptAudio();
       }
 
@@ -1070,7 +1191,10 @@ function attachHandlers() {
     }
 
     if (event.key === "Enter") {
-      if (state.submitted && shouldShowContinue(Boolean(state.lastResultCorrect))) {
+      if (
+        state.submitted &&
+        shouldShowContinue(Boolean(state.lastResultCorrect))
+      ) {
         loadRound();
       } else if (!state.submitted) {
         submitCurrentAnswer();
