@@ -678,6 +678,38 @@ h4 {
   margin-top: 3px;
 }
 
+.app-footer {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 8px auto 22px;
+  padding: 0 20px;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.footer-line {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.app-footer a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-footer a:hover,
+.app-footer a:focus-visible {
+  text-decoration: underline;
+}
+
+.footer-sep {
+  margin: 0 4px;
+  color: rgba(80, 110, 124, 0.6);
+}
+
 @media (max-width: 1040px) {
   .columns {
     grid-template-columns: 1fr;
@@ -909,5 +941,9 @@ h4 {
 
   .history-pattern-label {
     color: rgba(180, 210, 222, 0.86);
+  }
+
+  .footer-sep {
+    color: rgba(165, 196, 208, 0.7);
   }
 }
