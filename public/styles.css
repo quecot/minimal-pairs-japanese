@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light dark;
   --bg-top: #f6efe6;
   --bg-bottom: #dbe8ee;
   --ink: #1a2a32;
@@ -22,7 +23,9 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--ink);
-  font-family: "Avenir Next", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  font-family:
+    "Avenir Next", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+    sans-serif;
   background: linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
 }
 
@@ -31,8 +34,16 @@ body {
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 12% 10%, rgba(255, 183, 77, 0.28), transparent 28%),
-    radial-gradient(circle at 90% 20%, rgba(0, 113, 145, 0.22), transparent 24%),
+    radial-gradient(
+      circle at 12% 10%,
+      rgba(255, 183, 77, 0.28),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 20%,
+      rgba(0, 113, 145, 0.22),
+      transparent 24%
+    ),
     radial-gradient(circle at 30% 88%, rgba(70, 164, 178, 0.2), transparent 30%);
   z-index: 0;
 }
@@ -88,7 +99,10 @@ body {
 
 .columns {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(420px, 1.7fr) minmax(240px, 1fr);
+  grid-template-columns: minmax(220px, 1fr) minmax(420px, 1.7fr) minmax(
+      240px,
+      1fr
+    );
   gap: 16px;
 }
 
@@ -141,7 +155,10 @@ h4 {
   font: inherit;
   padding: 9px 14px;
   cursor: pointer;
-  transition: transform 140ms ease, filter 140ms ease, background-color 140ms ease;
+  transition:
+    transform 140ms ease,
+    filter 140ms ease,
+    background-color 140ms ease;
 }
 
 .btn:hover {
@@ -495,12 +512,20 @@ h4 {
 
 .history-item.ok {
   border-color: rgba(201, 109, 0, 0.52);
-  background: linear-gradient(155deg, rgba(201, 109, 0, 0.2), rgba(255, 255, 255, 0.85));
+  background: linear-gradient(
+    155deg,
+    rgba(201, 109, 0, 0.2),
+    rgba(255, 255, 255, 0.85)
+  );
 }
 
 .history-item.bad {
   border-color: rgba(29, 95, 191, 0.5);
-  background: linear-gradient(155deg, rgba(29, 95, 191, 0.2), rgba(255, 255, 255, 0.85));
+  background: linear-gradient(
+    155deg,
+    rgba(29, 95, 191, 0.2),
+    rgba(255, 255, 255, 0.85)
+  );
 }
 
 .history-head {
@@ -656,5 +681,233 @@ h4 {
 @media (max-width: 1040px) {
   .columns {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-top: #101820;
+    --bg-bottom: #0c141c;
+    --ink: #e6f0f4;
+    --ink-muted: #a6bcc8;
+    --panel: rgba(17, 28, 36, 0.84);
+    --panel-border: rgba(141, 181, 199, 0.2);
+    --accent: #2f93a8;
+    --accent-strong: #216f80;
+    --success: #73d486;
+    --danger: #ff9b75;
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .ambient {
+    background-image:
+      radial-gradient(
+        circle at 12% 10%,
+        rgba(255, 165, 74, 0.18),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 90% 20%,
+        rgba(50, 141, 171, 0.2),
+        transparent 26%
+      ),
+      radial-gradient(
+        circle at 30% 88%,
+        rgba(36, 101, 118, 0.24),
+        transparent 32%
+      );
+  }
+
+  .status.warn {
+    background: rgba(201, 109, 0, 0.2);
+    color: #f1bc86;
+  }
+
+  .status.error {
+    background: rgba(217, 72, 15, 0.22);
+    color: #ffc6b3;
+  }
+
+  .status.info {
+    background: rgba(11, 114, 133, 0.22);
+    color: #a7dce7;
+  }
+
+  .btn-secondary {
+    background: rgba(63, 126, 146, 0.2);
+    border-color: rgba(127, 180, 199, 0.34);
+    color: var(--ink);
+  }
+
+  .mora-group {
+    border-color: rgba(116, 161, 180, 0.24);
+    background: rgba(13, 23, 30, 0.72);
+  }
+
+  .mora-graph-wrap {
+    border-color: rgba(108, 162, 184, 0.28);
+    background: rgba(12, 20, 27, 0.88);
+  }
+
+  .graph-guide.high {
+    stroke: rgba(230, 159, 76, 0.48);
+  }
+
+  .graph-guide.low {
+    stroke: rgba(98, 150, 231, 0.46);
+  }
+
+  .graph-level-label.high {
+    fill: #f0b472;
+  }
+
+  .graph-level-label.low {
+    fill: #90bbff;
+  }
+
+  .graph-path {
+    stroke: rgba(185, 217, 228, 0.88);
+  }
+
+  .graph-path-ghost {
+    stroke: rgba(185, 217, 228, 0.38);
+  }
+
+  .graph-path-correct.is-submitted {
+    stroke: rgba(214, 233, 240, 0.98);
+  }
+
+  .graph-vertical-marker {
+    stroke: rgba(117, 158, 176, 0.24);
+  }
+
+  .graph-mora-label {
+    fill: rgba(203, 224, 233, 0.92);
+  }
+
+  .graph-dot.is-high {
+    fill: rgba(230, 154, 63, 0.96);
+    stroke: rgba(255, 191, 116, 0.96);
+  }
+
+  .graph-dot.is-low {
+    fill: rgba(92, 147, 232, 0.94);
+    stroke: rgba(148, 188, 252, 0.96);
+  }
+
+  .graph-dot.is-unset {
+    fill: rgba(115, 138, 151, 0.45);
+    stroke: rgba(149, 174, 188, 0.7);
+  }
+
+  .mora-tile {
+    border-color: rgba(118, 159, 176, 0.28);
+    background: rgba(13, 22, 30, 0.82);
+  }
+
+  .intonation-btn {
+    border-color: rgba(123, 160, 177, 0.34);
+    background: rgba(26, 40, 49, 0.95);
+    color: var(--ink-muted);
+  }
+
+  .intonation-btn.selected-high {
+    background: rgba(201, 109, 0, 0.24);
+    border-color: rgba(235, 162, 83, 0.78);
+    color: #ffd4a9;
+  }
+
+  .intonation-btn.selected-low {
+    background: rgba(29, 95, 191, 0.28);
+    border-color: rgba(117, 163, 238, 0.82);
+    color: #c8e0ff;
+  }
+
+  .result-panel {
+    border-color: rgba(107, 156, 177, 0.26);
+    background: rgba(14, 24, 31, 0.88);
+  }
+
+  .pattern-chip {
+    border-color: rgba(126, 162, 178, 0.34);
+    background: rgba(14, 23, 30, 0.86);
+  }
+
+  .reference-panel {
+    border-color: rgba(99, 147, 168, 0.48);
+    background: rgba(13, 22, 30, 0.8);
+  }
+
+  .reference-option {
+    border-color: rgba(106, 160, 181, 0.34);
+    background: rgba(16, 28, 36, 0.9);
+    color: var(--ink);
+  }
+
+  .history-item {
+    border-color: rgba(106, 157, 178, 0.36);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.26);
+  }
+
+  .history-item.ok {
+    border-color: rgba(224, 148, 68, 0.56);
+    background: linear-gradient(
+      155deg,
+      rgba(201, 109, 0, 0.24),
+      rgba(13, 22, 30, 0.9)
+    );
+  }
+
+  .history-item.bad {
+    border-color: rgba(113, 163, 242, 0.58);
+    background: linear-gradient(
+      155deg,
+      rgba(29, 95, 191, 0.28),
+      rgba(13, 22, 30, 0.9)
+    );
+  }
+
+  .history-outcome.ok {
+    background: rgba(201, 109, 0, 0.24);
+    border-color: rgba(230, 158, 82, 0.56);
+    color: #ffd4a6;
+  }
+
+  .history-outcome.bad {
+    background: rgba(29, 95, 191, 0.28);
+    border-color: rgba(117, 163, 238, 0.58);
+    color: #c8e0ff;
+  }
+
+  .history-graph-wrap {
+    border-color: rgba(104, 153, 172, 0.34);
+    background: rgba(13, 23, 30, 0.74);
+  }
+
+  .history-mini-path {
+    stroke: rgba(183, 216, 227, 0.88);
+  }
+
+  .history-tone-chip {
+    border-color: rgba(106, 160, 181, 0.36);
+    background: rgba(16, 28, 36, 0.9);
+  }
+
+  .history-tone-chip.tone-high {
+    background: rgba(201, 109, 0, 0.24);
+    color: #ffd4a6;
+  }
+
+  .history-tone-chip.tone-low {
+    background: rgba(29, 95, 191, 0.28);
+    color: #c8e0ff;
+  }
+
+  .history-patterns {
+    border-top-color: rgba(104, 153, 172, 0.36);
+  }
+
+  .history-pattern-label {
+    color: rgba(180, 210, 222, 0.86);
   }
 }

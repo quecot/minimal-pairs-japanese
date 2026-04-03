@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <title>Minimal Pairs Intonation Replica</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
@@ -12,18 +13,20 @@
       <header class="app-header">
         <h1>Pitch Accent Minimal Pairs</h1>
         <p>
-          Replica of the Kotu minimal-pairs perception test, changed so each answer is
-          high or low for every mora.
+          Replica of the Kotu minimal-pairs perception test, changed so each
+          answer is high or low for every mora.
         </p>
       </header>
 
       <section id="startPanel" class="start-panel">
         <h2>Per-Mora Intonation Mode</h2>
         <p>
-          Listen to the prompt audio, then mark each mora as High (H) or Low (L).
-          Submit when all mora are marked.
+          Listen to the prompt audio, then mark each mora as High (H) or Low
+          (L). Submit when all mora are marked.
         </p>
-        <button id="startButton" class="btn btn-primary btn-large">Start</button>
+        <button id="startButton" class="btn btn-primary btn-large">
+          Start
+        </button>
       </section>
 
       <section id="mainPanel" class="main-panel hidden">
@@ -34,14 +37,18 @@
           </aside>
 
           <section class="panel prompt-panel">
-            <div id="loadingNotice" class="loading hidden">Loading next item...</div>
+            <div id="loadingNotice" class="loading hidden">
+              Loading next item...
+            </div>
             <div id="statusNotice" class="status hidden"></div>
 
             <div id="promptBody" class="prompt-body hidden">
               <h2 id="kanaHeading"></h2>
               <div class="audio-row">
                 <audio id="promptAudio" controls preload="none"></audio>
-                <button id="replayButton" class="btn btn-secondary">Replay Prompt</button>
+                <button id="replayButton" class="btn btn-secondary">
+                  Replay Prompt
+                </button>
               </div>
 
               <hr />
@@ -50,14 +57,20 @@
               <div id="moraAnswerArea" class="mora-answer-area"></div>
 
               <div class="action-row">
-                <button id="submitButton" class="btn btn-primary" disabled>Submit</button>
-                <button id="continueButton" class="btn btn-primary hidden">Continue</button>
+                <button id="submitButton" class="btn btn-primary" disabled>
+                  Submit
+                </button>
+                <button id="continueButton" class="btn btn-primary hidden">
+                  Continue
+                </button>
               </div>
 
               <div id="resultPanel" class="result-panel hidden"></div>
               <div id="referencePanel" class="reference-panel hidden">
                 <h4>Reference Patterns</h4>
-                <p>After submitting, click any option below to hear that pattern.</p>
+                <p>
+                  After submitting, click any option below to hear that pattern.
+                </p>
                 <div id="referenceOptions" class="reference-options"></div>
               </div>
             </div>
@@ -87,7 +100,11 @@
               <span>Nakadaka (other internal drop)</span>
             </label>
             <label class="check-row">
-              <input type="checkbox" id="secondToLastMoraAccentEnabled" checked />
+              <input
+                type="checkbox"
+                id="secondToLastMoraAccentEnabled"
+                checked
+              />
               <span>Nakadaka (second-to-last drop)</span>
             </label>
 
