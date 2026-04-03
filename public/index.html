@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimal Pairs Intonation Replica</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="ambient"></div>
+    <main class="app-shell">
+      <header class="app-header">
+        <h1>Pitch Accent Minimal Pairs</h1>
+        <p>
+          Replica of the Kotu minimal-pairs perception test, changed so each answer is
+          high or low for every mora.
+        </p>
+      </header>
+
+      <section id="startPanel" class="start-panel">
+        <h2>Per-Mora Intonation Mode</h2>
+        <p>
+          Listen to the prompt audio, then mark each mora as High (H) or Low (L).
+          Submit when all mora are marked.
+        </p>
+        <button id="startButton" class="btn btn-primary btn-large">Start</button>
+      </section>
+
+      <section id="mainPanel" class="main-panel hidden">
+        <div class="columns">
+          <aside class="panel history-panel">
+            <h3>History</h3>
+            <ul id="historyList" class="history-list"></ul>
+          </aside>
+
+          <section class="panel prompt-panel">
+            <div id="loadingNotice" class="loading hidden">Loading next item...</div>
+            <div id="statusNotice" class="status hidden"></div>
+
+            <div id="promptBody" class="prompt-body hidden">
+              <h2 id="kanaHeading"></h2>
+              <div class="audio-row">
+                <audio id="promptAudio" controls preload="none"></audio>
+                <button id="replayButton" class="btn btn-secondary">Replay Prompt</button>
+              </div>
+
+              <hr />
+
+              <h4>Answer Intonation For Each Mora</h4>
+              <div id="moraAnswerArea" class="mora-answer-area"></div>
+
+              <div class="action-row">
+                <button id="submitButton" class="btn btn-primary" disabled>Submit</button>
+                <button id="continueButton" class="btn btn-primary hidden">Continue</button>
+              </div>
+
+              <div id="resultPanel" class="result-panel hidden"></div>
+              <div id="referencePanel" class="reference-panel hidden">
+                <h4>Reference Patterns</h4>
+                <p>After submitting, click any option below to hear that pattern.</p>
+                <div id="referenceOptions" class="reference-options"></div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="panel stats-panel">
+            <h3>Patterns</h3>
+            <div id="statisticsArea" class="statistics-area"></div>
+
+            <hr />
+
+            <h4>Pattern Filters</h4>
+            <label class="check-row">
+              <input type="checkbox" id="heibanEnabled" checked />
+              <span>Heiban / Odaka</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" id="atamadakaEnabled" checked />
+              <span>Atamadaka</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" id="secondMoraAccentEnabled" checked />
+              <span>Nakadaka (2nd mora drop)</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" id="otherNakadakaEnabled" checked />
+              <span>Nakadaka (other internal drop)</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" id="secondToLastMoraAccentEnabled" checked />
+              <span>Nakadaka (second-to-last drop)</span>
+            </label>
+
+            <hr />
+
+            <h4>Other</h4>
+            <label class="check-row">
+              <input type="checkbox" id="onlyDevoicedWords" />
+              <span>Only devoiced words</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" id="lowPassEnabled" />
+              <span>Muffle audio</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" id="backgroundNoise" />
+              <span>Add background noise</span>
+            </label>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

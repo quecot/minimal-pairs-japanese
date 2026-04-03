@@ -1,0 +1,17 @@
+{
+  "name": "minimal-pairs-intonation-replica",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Replica of Kotu pitch-accent minimal pairs test with per-mora high/low answering",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
