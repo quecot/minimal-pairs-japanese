@@ -6,12 +6,19 @@
   "description": "Replica of Kotu pitch-accent minimal pairs test with per-mora high/low answering",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "cf:login": "wrangler login",
+    "cf:whoami": "wrangler whoami",
+    "dev:worker": "wrangler dev",
+    "deploy:worker": "wrangler deploy"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.80.0"
   }
 }
