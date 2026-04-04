@@ -264,7 +264,10 @@ async function proxyRandomMinimalPair(request) {
     return jsonResponse(upstream.status, sanitizeMinimalPairData(data));
   } catch (error) {
     console.warn("Falling back to local minimal-pair sample data", error);
-    return jsonResponse(200, sanitizeMinimalPairData(pickFallbackMinimalPair()));
+    return jsonResponse(
+      200,
+      sanitizeMinimalPairData(pickFallbackMinimalPair()),
+    );
   }
 }
 

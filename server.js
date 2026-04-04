@@ -32,13 +32,13 @@ const fallbackMinimalPairs = [
                     accentedMora: 2,
                     silencedMoras: [],
                     nasalizedMoras: [],
-                    notes: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+                    notes: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
       {
         id: "8AC4A3DE-CD45-4A3D-A40A-4DB33D69949C",
@@ -57,15 +57,15 @@ const fallbackMinimalPairs = [
                     accentedMora: 1,
                     silencedMoras: [],
                     nasalizedMoras: [],
-                    notes: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
+                    notes: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   {
     kana: "はな",
@@ -87,13 +87,13 @@ const fallbackMinimalPairs = [
                     accentedMora: 1,
                     silencedMoras: [],
                     nasalizedMoras: [],
-                    notes: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+                    notes: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
       {
         id: "fallback-hana-2",
@@ -112,16 +112,16 @@ const fallbackMinimalPairs = [
                     accentedMora: 2,
                     silencedMoras: [],
                     nasalizedMoras: [],
-                    notes: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                    notes: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 app.use((req, _res, next) => {
@@ -238,11 +238,14 @@ function buildUpstreamURL(pathname, query) {
 
 app.get("/api/tests/pitchAccent/minimalPairs/random", async (req, res) => {
   try {
-    const upstreamURL = buildUpstreamURL("/api/tests/pitchAccent/minimalPairs/random", req.query);
+    const upstreamURL = buildUpstreamURL(
+      "/api/tests/pitchAccent/minimalPairs/random",
+      req.query,
+    );
     const upstream = await fetch(upstreamURL, {
       headers: {
-        "User-Agent": "minimal-pairs-intonation-replica"
-      }
+        "User-Agent": "minimal-pairs-intonation-replica",
+      },
     });
 
     if (!upstream.ok) {
@@ -250,7 +253,7 @@ app.get("/api/tests/pitchAccent/minimalPairs/random", async (req, res) => {
       return res.status(upstream.status).json({
         error: "Upstream request failed",
         status: upstream.status,
-        detail: text
+        detail: text,
       });
     }
 
@@ -258,7 +261,10 @@ app.get("/api/tests/pitchAccent/minimalPairs/random", async (req, res) => {
     return res.json(sanitizeMinimalPairData(data));
   } catch (error) {
     console.warn("Falling back to local minimal-pair sample data:", error);
-    const sample = fallbackMinimalPairs[Math.floor(Math.random() * fallbackMinimalPairs.length)];
+    const sample =
+      fallbackMinimalPairs[
+        Math.floor(Math.random() * fallbackMinimalPairs.length)
+      ];
     return res.json(sanitizeMinimalPairData(sample));
   }
 });
@@ -266,11 +272,14 @@ app.get("/api/tests/pitchAccent/minimalPairs/random", async (req, res) => {
 app.get("/api/pronunciation/audio/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const upstreamURL = buildUpstreamURL(`/api/pronunciation/audio/${id}`, req.query);
+    const upstreamURL = buildUpstreamURL(
+      `/api/pronunciation/audio/${id}`,
+      req.query,
+    );
     const upstream = await fetch(upstreamURL, {
       headers: {
-        "User-Agent": "minimal-pairs-intonation-replica"
-      }
+        "User-Agent": "minimal-pairs-intonation-replica",
+      },
     });
 
     if (!upstream.ok) {
@@ -278,7 +287,7 @@ app.get("/api/pronunciation/audio/:id", async (req, res) => {
       return res.status(upstream.status).json({
         error: "Upstream audio request failed",
         status: upstream.status,
-        detail: text
+        detail: text,
       });
     }
 
@@ -303,7 +312,7 @@ app.get("/api/pronunciation/audio/:id", async (req, res) => {
   } catch (error) {
     return res.status(502).json({
       error: "Could not retrieve audio from upstream",
-      detail: error instanceof Error ? error.message : String(error)
+      detail: error instanceof Error ? error.message : String(error),
     });
   }
 });
