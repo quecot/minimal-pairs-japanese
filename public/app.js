@@ -97,6 +97,7 @@ const state = {
 const dom = {
   startPanel: document.getElementById("startPanel"),
   mainPanel: document.getElementById("mainPanel"),
+  promptPanel: document.querySelector(".prompt-panel"),
   startButton: document.getElementById("startButton"),
   loadingNotice: document.getElementById("loadingNotice"),
   statusNotice: document.getElementById("statusNotice"),
@@ -367,6 +368,23 @@ function hideStatus() {
   dom.statusNotice.classList.add("hidden");
 }
 
+function scrollPromptPanelIntoView() {
+  if (!state.started || !dom.promptPanel) {
+    return;
+  }
+
+  const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+
+  window.requestAnimationFrame(() => {
+    dom.promptPanel.scrollIntoView({
+      behavior,
+      block: "start",
+    });
+  });
+}
+
 function playPromptAudio() {
   if (!state.currentQuestion) {
     return;
@@ -411,6 +429,7 @@ function presentQuestion(minimalPair) {
   state.lastResultCorrect = null;
   state.loading = false;
   render();
+  scrollPromptPanelIntoView();
   playPromptAudio();
 }
 
@@ -1192,6 +1211,7 @@ function attachHandlers() {
   dom.startButton.addEventListener("click", async () => {
     state.started = true;
     render();
+    scrollPromptPanelIntoView();
     await loadRound();
   });
 

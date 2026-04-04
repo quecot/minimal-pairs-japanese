@@ -118,6 +118,7 @@ body {
 
 .prompt-panel {
   grid-area: prompt;
+  scroll-margin-top: 12px;
 }
 
 .stats-panel {
