@@ -108,7 +108,20 @@ body {
       240px,
       1fr
     );
+  grid-template-areas: "history prompt stats";
   gap: 16px;
+}
+
+.history-panel {
+  grid-area: history;
+}
+
+.prompt-panel {
+  grid-area: prompt;
+}
+
+.stats-panel {
+  grid-area: stats;
 }
 
 .panel {
@@ -718,6 +731,47 @@ h4 {
 @media (max-width: 1040px) {
   .columns {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "prompt"
+      "history"
+      "stats";
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 14px;
+  }
+
+  .app-header {
+    margin-bottom: 12px;
+  }
+
+  .panel,
+  .start-panel {
+    border-radius: 14px;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .history-panel {
+    max-height: 44vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .history-panel .history-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .app-footer {
+    margin-bottom: 14px;
+    padding: 0 14px;
   }
 }
 
