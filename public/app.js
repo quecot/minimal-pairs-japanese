@@ -27,11 +27,13 @@ const COMBINING_KANA = new Set([
 
 const MORA_BASE_CHAR = /[\p{Script=Hiragana}\p{Script=Katakana}ーｰ]/u;
 const COMBINING_MARK_CHAR = /\p{Mark}/u;
+const COMBINING_DAKUTEN = "\u3099";
+const COMBINING_HANDAKUTEN = "\u309A";
 const DAKUTEN_VARIANTS = new Map([
-  ["\u309B", "\u3099"],
-  ["\u309C", "\u309A"],
-  ["\uFF9E", "\u3099"],
-  ["\uFF9F", "\u309A"],
+  ["\u309B", COMBINING_DAKUTEN],
+  ["\u309C", COMBINING_HANDAKUTEN],
+  ["\uFF9E", COMBINING_DAKUTEN],
+  ["\uFF9F", COMBINING_HANDAKUTEN],
 ]);
 const NON_MORA_SEPARATORS = new Set([
   " ",
@@ -56,6 +58,26 @@ function normalizePronunciationText(text) {
   for (const [from, to] of DAKUTEN_VARIANTS) {
     value = value.replaceAll(from, to);
   }
+
+  const chars = Array.from(value);
+  for (let i = 1; i < chars.length; i += 1) {
+    if (chars[i] !== COMBINING_HANDAKUTEN) {
+      continue;
+    }
+
+    const base = chars[i - 1];
+    const handakutenPair = `${base}${COMBINING_HANDAKUTEN}`;
+    const dakutenPair = `${base}${COMBINING_DAKUTEN}`;
+    const canComposeHandakuten =
+      handakutenPair.normalize("NFC") !== handakutenPair;
+    const canComposeDakuten = dakutenPair.normalize("NFC") !== dakutenPair;
+
+    if (!canComposeHandakuten && canComposeDakuten) {
+      chars[i] = COMBINING_DAKUTEN;
+    }
+  }
+
+  value = chars.join("");
   return value.normalize("NFKC").normalize("NFC");
 }
 

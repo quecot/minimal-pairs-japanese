@@ -1,5 +1,7 @@
 const upstreamBaseURL = "https://kotu.io";
 const workerUserAgent = "minimal-pairs-intonation-replica-worker";
+const COMBINING_DAKUTEN = "\u3099";
+const COMBINING_HANDAKUTEN = "\u309A";
 
 const fallbackMinimalPairs = [
   {
@@ -132,6 +134,100 @@ function jsonResponse(status, body) {
   });
 }
 
+function normalizePronunciationText(text) {
+  let value = text
+    .replaceAll("\u309B", COMBINING_DAKUTEN)
+    .replaceAll("\u309C", COMBINING_HANDAKUTEN)
+    .replaceAll("\uFF9E", COMBINING_DAKUTEN)
+    .replaceAll("\uFF9F", COMBINING_HANDAKUTEN);
+
+  const chars = Array.from(value);
+  for (let i = 1; i < chars.length; i += 1) {
+    if (chars[i] !== COMBINING_HANDAKUTEN) {
+      continue;
+    }
+
+    const base = chars[i - 1];
+    const handakutenPair = `${base}${COMBINING_HANDAKUTEN}`;
+    const dakutenPair = `${base}${COMBINING_DAKUTEN}`;
+    const canComposeHandakuten =
+      handakutenPair.normalize("NFC") !== handakutenPair;
+    const canComposeDakuten = dakutenPair.normalize("NFC") !== dakutenPair;
+
+    if (!canComposeHandakuten && canComposeDakuten) {
+      chars[i] = COMBINING_DAKUTEN;
+    }
+  }
+
+  value = chars.join("");
+  return value.normalize("NFKC").normalize("NFC");
+}
+
+function sanitizePhrase(phrase) {
+  if (!phrase || typeof phrase !== "object") {
+    return phrase;
+  }
+  if (typeof phrase.rawPronunciation !== "string") {
+    return phrase;
+  }
+  return {
+    ...phrase,
+    rawPronunciation: normalizePronunciationText(phrase.rawPronunciation),
+  };
+}
+
+function sanitizePronunciation(pronunciation) {
+  if (!pronunciation || typeof pronunciation !== "object") {
+    return pronunciation;
+  }
+  if (!Array.isArray(pronunciation.phrases)) {
+    return pronunciation;
+  }
+  return {
+    ...pronunciation,
+    phrases: pronunciation.phrases.map(sanitizePhrase),
+  };
+}
+
+function sanitizeEntry(entry) {
+  if (!entry || typeof entry !== "object") {
+    return entry;
+  }
+  if (!Array.isArray(entry.pronunciations)) {
+    return entry;
+  }
+  return {
+    ...entry,
+    pronunciations: entry.pronunciations.map(sanitizePronunciation),
+  };
+}
+
+function sanitizePair(pair) {
+  if (!pair || typeof pair !== "object") {
+    return pair;
+  }
+  if (!Array.isArray(pair.entries)) {
+    return pair;
+  }
+  return {
+    ...pair,
+    entries: pair.entries.map(sanitizeEntry),
+  };
+}
+
+function sanitizeMinimalPairData(data) {
+  if (!data || typeof data !== "object") {
+    return data;
+  }
+  if (!Array.isArray(data.pairs)) {
+    return data;
+  }
+  return {
+    ...data,
+    pairs: data.pairs.map(sanitizePair),
+  };
+}
+
 function pickFallbackMinimalPair() {
   const index = Math.floor(Math.random() * fallbackMinimalPairs.length);
   return fallbackMinimalPairs[index];
@@ -160,10 +256,15 @@ async function proxyRandomMinimalPair(request) {
       });
     }
 
-    return upstream;
+    if (request.method === "HEAD") {
+      return upstream;
+    }
+
+    const data = await upstream.json();
+    return jsonResponse(upstream.status, sanitizeMinimalPairData(data));
   } catch (error) {
     console.warn("Falling back to local minimal-pair sample data", error);
-    return jsonResponse(200, pickFallbackMinimalPair());
+    return jsonResponse(200, sanitizeMinimalPairData(pickFallbackMinimalPair()));
   }
 }
 
