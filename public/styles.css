@@ -72,6 +72,7 @@ body {
   max-width: 740px;
   color: var(--ink-muted);
   line-height: 1.45;
+  text-wrap: balance;
 }
 
 .start-panel,
@@ -91,6 +92,10 @@ body {
 
 .start-panel h2 {
   margin-top: 0;
+}
+
+.start-panel p {
+  text-wrap: balance;
 }
 
 .main-panel {
